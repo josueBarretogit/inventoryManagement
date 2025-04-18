@@ -132,6 +132,7 @@ export default class InventoryManagerMock implements InventoryManager {
   }
 
   async createProduct(data: ProductUpdateCreate): Promise<void> {
+    await sleepFor(500);
     products.push({ _id: Math.random().toString(), ...data })
   }
 

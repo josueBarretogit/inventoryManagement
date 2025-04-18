@@ -1,9 +1,11 @@
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useActionState, useEffect, useState } from "react";
 import { Product, ProductUpdateCreate } from "../types/product";
 import { InventoryManager } from "../types/services";
 import Modal from "../components/modal";
 import { SpinnerLoader } from "../components/loader";
 import { InputForm, SelectForm } from "../components/inputForm";
+import { useFormStatus } from "react-dom";
+import SubmitFormButton from "../components/submitForm";
 
 
 interface DashboardProps {
@@ -15,6 +17,7 @@ interface TableRowProps {
   handleDeleteOnClick: () => void
   onUpdateClick: () => void
 }
+
 
 
 function TableRow({ item, handleDeleteOnClick: handleClick, onUpdateClick }: TableRowProps) {
@@ -50,37 +53,70 @@ function TableRow({ item, handleDeleteOnClick: handleClick, onUpdateClick }: Tab
 
 interface CreateProductModalProps {
   onClose: () => void
-
+  onCreate: (product: ProductUpdateCreate) => Promise<void>
 }
 
-function CreateProductModal({ onClose }: CreateProductModalProps) {
+function CreateProductModalForm({ onClose, onCreate }: CreateProductModalProps) {
+
+  const [data, formAction, isPending] = useActionState(handleSubmit, null)
+
+  async function handleSubmit(_: unknown, data: FormData) {
+
+    let image = data.get("image") as File
+    let name = data.get("name") as string
+
+
+    if (name.length == 0) {
+      return { error: "Name is not sufficiently long" }
+    }
+
+    let newProduct: ProductUpdateCreate = {
+      name: data.get("name") as string,
+      sku: data.get("sku") as string,
+      categoryId: data.get("category") as string,
+      description: data.get("description") as string,
+      imageUrl: `htpps://${image.name}`,
+      quantity: 100,
+      price: 9.49,
+      supplier: "Belkin",
+      createdAt: "2025-04-05T14:15:00Z",
+    }
+
+    //validate(newProduct)
+    await onCreate(newProduct)
+
+  }
+
   return <Modal onClose={onClose} >
     <h2 className="p-10">Create product</h2>
 
-    <form className="w-full">
+    <form className="w-full" action={formAction} >
 
       <div className="mb-10 flex justify-evenly space-x-8">
-        <InputForm label="Name" />
-        <InputForm label="Sku" />
+        <InputForm label="Name" name="name" required />
+        <InputForm label="Sku" name="sku" required />
       </div>
 
       <div className="mb-10 flex justify-evenly space-x-8">
-        <SelectForm label="Category" options={["Electronics", "Accesories"]} />
-        <InputForm label="description" />
+        <SelectForm label="Category" name="category" options={["Electronics", "Accesories"]} required />
+        <InputForm label="description" name="description" required />
       </div>
 
 
       <div className="mb-10 flex justify-evenly space-x-8">
-        <InputForm label="Quantity" type="number" />
-        <InputForm label="Price" type="number" />
+        <InputForm label="Quantity" type="number" name="quantity" required />
+        <InputForm label="Price" type="number" name="price" required />
       </div>
 
       <div className="mb-10 flex justify-evenly space-x-8">
-        <SelectForm label="supplier" options={["Ikea", "Logitech", "KeyChron", "Belkin"]} />
-        <InputForm label="Stock" type="number" />
+        <SelectForm label="Supplier" name="supplier" options={["Ikea", "Logitech", "KeyChron", "Belkin"]} required />
+        <InputForm label="Image" type="file" name="image" required />
       </div>
 
-      <button type="submit" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Create</button>
+      {data?.error && <span style={{ color: "red" }}>{data.error}</span>}
+      < button type="submit" disabled={isPending} className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" >{isPending ? "Loading" : "Create"} </button >
+
+
     </form>
 
   </Modal>
@@ -181,7 +217,10 @@ export default function Dashboard({ inventoryManager }: DashboardProps) {
       </div>
 
       {isOpenModalCreate &&
-        <CreateProductModal onClose={() => setIsOpenModalCreate(false)} />
+        <CreateProductModalForm onClose={() => setIsOpenModalCreate(false)} onCreate={async (data) => {
+          await createProduct(data)
+          setIsOpenModalCreate(false)
+        }} />
       }
 
       {isOpenModalUpdate &&
