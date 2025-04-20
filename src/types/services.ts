@@ -5,7 +5,7 @@ export interface InventoryManager {
 
   createProduct(data: ProductUpdateCreate): Promise<void>;
 
-  updateProduct(id: string, data: ProductUpdateCreate): Promise<void>;
+  updateProduct(product: Product): Promise<void>;
 
   deleteProduct(id: string): Promise<void>;
 }

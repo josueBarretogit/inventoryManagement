@@ -1,5 +1,5 @@
 export interface Product {
-  _id?: string;
+  id: string;
   name: string;
   sku: string;
   categoryId: string;
@@ -11,5 +11,4 @@ export interface Product {
   createdAt?: string;
 }
 
-export type ProductUpdateCreate = Omit<Product, "_id">
-
+export type ProductUpdateCreate = Omit<Product, "id">;

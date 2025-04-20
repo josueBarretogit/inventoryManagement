@@ -1,25 +1,27 @@
-import express from 'express'
+import express from "express";
 import ProductRouter from "./routes/product.router";
 import { MongoDatabase } from "./services/mongo/mongoDriver";
-import bodyParser from 'body-parser';
+import bodyParser from "body-parser";
+import cors from "cors";
 
 export default class Server {
-        static async startServer() {
-                let client = await MongoDatabase.connectToDatabase()
+  static async startServer() {
+    let client = await MongoDatabase.connectToDatabase();
 
-                const db = new MongoDatabase(client)
+    const db = new MongoDatabase(client);
 
-                const router = new ProductRouter(db, express.Router())
+    const router = new ProductRouter(db, express.Router());
 
-                const app = express()
+    const app = express();
 
-                app.use(express.json())
-                app.use(bodyParser.urlencoded({ extended: true }))
+    app.use(cors());
 
-                app.use("/product", router.routes())
+    app.use(express.json());
 
-                app.listen(3000, () => console.log("listening on port : 3000"))
-        }
+    app.use(bodyParser.urlencoded({ extended: true }));
+
+    app.use("/product", router.routes());
+
+    app.listen(3000, () => console.log("listening on port : 3000"));
+  }
 }
-
-

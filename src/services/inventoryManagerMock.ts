@@ -11,7 +11,7 @@ function sleepFor(duration: number) {
 
 let products: Product[] = [
   {
-    _id: "1",
+    id: "1",
     name: "Wireless Mouse",
     sku: "MOUSE-001",
     categoryId: "electronics",
@@ -23,7 +23,7 @@ let products: Product[] = [
     createdAt: "2025-04-12T10:30:00Z",
   },
   {
-    _id: "2",
+    id: "2",
     name: "Mechanical Keyboard",
     sku: "KEYB-002",
     categoryId: "electronics",
@@ -35,7 +35,7 @@ let products: Product[] = [
     createdAt: "2025-04-10T09:00:00Z",
   },
   {
-    _id: "3",
+    id: "3",
     name: "HDMI Cable 1.5m",
     sku: "CABLE-003",
     categoryId: "accessories",
@@ -47,7 +47,7 @@ let products: Product[] = [
     createdAt: "2025-04-05T14:15:00Z",
   },
   {
-    _id: "3",
+    id: "3",
     name: "HDMI Cable 1.5m",
     sku: "CABLE-003",
     categoryId: "accessories",
@@ -59,7 +59,7 @@ let products: Product[] = [
     createdAt: "2025-04-05T14:15:00Z",
   },
   {
-    _id: "4",
+    id: "4",
     name: "HDMI Cable 1.5m",
     sku: "CABLE-003",
     categoryId: "accessories",
@@ -71,7 +71,7 @@ let products: Product[] = [
     createdAt: "2025-04-05T14:15:00Z",
   },
   {
-    _id: "5",
+    id: "5",
     name: "HDMI Cable 1.5m",
     sku: "CABLE-003",
     categoryId: "accessories",
@@ -83,7 +83,7 @@ let products: Product[] = [
     createdAt: "2025-04-05T14:15:00Z",
   },
   {
-    _id: "6",
+    id: "6",
     name: "HDMI Cable 1.5m",
     sku: "CABLE-003",
     categoryId: "accessories",
@@ -95,7 +95,7 @@ let products: Product[] = [
     createdAt: "2025-04-05T14:15:00Z",
   },
   {
-    _id: "7",
+    id: "7",
     name: "HDMI Cable 1.5m",
     sku: "CABLE-003",
     categoryId: "accessories",
@@ -107,7 +107,7 @@ let products: Product[] = [
     createdAt: "2025-04-05T14:15:00Z",
   },
   {
-    _id: "8",
+    id: "8",
     name: "HDMI Cable 1.5m",
     sku: "CABLE-003",
     categoryId: "accessories",
@@ -118,40 +118,51 @@ let products: Product[] = [
     supplier: "Belkin",
     createdAt: "2025-04-05T14:15:00Z",
   },
-]
+  {
+    id: "9",
+    name: "HDMI Cable 1.5m",
+    sku: "CABLE-003",
+    categoryId: "accessories",
+    description: "High-speed HDMI 2.1 cable with gold-plated connectors",
+    imageUrl: "https://example.com/images/hdmi-cable.jpg",
+    quantity: 100,
+    price: 9.49,
+    supplier: "Belkin",
+    createdAt: "2025-04-05T14:15:00Z",
+  },
+];
 
 export default class InventoryManagerMock implements InventoryManager {
-
   async getProducts(): Promise<Product[] | Error> {
     try {
       await sleepFor(500);
       return products;
     } catch (e) {
-      return new Error(`an error ocurred: ${e}`)
+      return new Error(`an error ocurred: ${e}`);
     }
   }
 
   async createProduct(data: ProductUpdateCreate): Promise<void> {
     await sleepFor(500);
-    products.push({ _id: Math.random().toString(), ...data })
+
+    products.push({ id: Math.random().toString(), ...data });
   }
 
-  async updateProduct(id: string, data: Omit<Product, "_id">): Promise<void> {
-    let index = products.findIndex(product => product._id == id);
+  async updateProduct(product: Product): Promise<void> {
+    const { id, ...productData } = product;
+    let index = products.findIndex((product) => product.id == id);
 
     if (index == -1) {
-      return
+      return;
     }
 
     products[index] = {
-      _id: id,
-      ...data
-    }
-
+      id: id,
+      ...productData,
+    };
   }
 
   async deleteProduct(id: string): Promise<void> {
-    products = products.filter((prod) => prod._id != id);
+    products = products.filter((prod) => prod.id != id);
   }
-
 }

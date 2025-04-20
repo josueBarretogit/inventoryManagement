@@ -5,12 +5,11 @@ export class Product {
     public categorId: string,
     public imageUrl: string,
     public quantity: number,
-    public price: string,
+    public price: number,
     public supplier: string,
-    public _id?: string,
+    public id: string,
     public description?: string,
-  ) { }
+  ) {}
 }
 
-export type ProductCreate = Omit<Product, "_id">
-
+export type ProductCreate = Omit<Product, "id">;
