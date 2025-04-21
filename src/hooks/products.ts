@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { Product, ProductUpdateCreate } from "../types/product";
 import { InventoryManager } from "../types/services";
 
@@ -21,8 +21,12 @@ export default function useProducts(
   }
 
   async function createProduct(data: ProductUpdateCreate) {
-    await inventoryManager.createProduct(data);
-    await fetchProducts();
+    try {
+      await inventoryManager.createProduct(data);
+      await fetchProducts();
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   async function updateProduct(product: Product) {
@@ -35,7 +39,7 @@ export default function useProducts(
     await fetchProducts();
   }
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     fetchProducts();
   }, []);
 

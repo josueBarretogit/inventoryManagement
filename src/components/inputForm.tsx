@@ -1,4 +1,4 @@
-import { HTMLInputTypeAttribute } from "react";
+import { HTMLInputTypeAttribute, useState } from "react";
 
 export interface InputFormProps {
   label: string;
@@ -6,6 +6,7 @@ export interface InputFormProps {
   type?: HTMLInputTypeAttribute;
   required?: boolean;
   placeholder?: string;
+  defaultValue?: string | number;
 }
 
 export function InputForm({
@@ -14,7 +15,9 @@ export function InputForm({
   type,
   required,
   name,
+  defaultValue,
 }: InputFormProps) {
+  const [value, setValue] = useState(String(defaultValue || ""));
   placeholder = placeholder == undefined ? "An example" : placeholder;
   type = type == undefined ? "text" : type;
   return (
@@ -27,6 +30,10 @@ export function InputForm({
           name={name}
           placeholder={placeholder}
           required={required}
+          value={value}
+          onChange={(e) => {
+            setValue(e.target.value);
+          }}
         />
       </div>
     </>

@@ -1,5 +1,5 @@
 import { useActionState } from "react";
-import { ProductUpdateCreate } from "../../types/product";
+import { Product, ProductUpdateCreate } from "../../types/product";
 import { InputForm, SelectForm } from "../inputForm";
 import Modal from "../modal";
 
@@ -9,12 +9,14 @@ export interface FormValidationError extends Partial<ProductUpdateCreate> {
 
 export interface UpdateProductModalProps {
   onClose: () => void;
-  onCreate: (product: ProductUpdateCreate) => Promise<void>;
+  productToUpdate: Product;
+  update: (product: Product) => void;
 }
 
 export default function UpdateProductModalForm({
   onClose,
-  onCreate,
+  update,
+  productToUpdate,
 }: UpdateProductModalProps) {
   const [possibleErrors, formAction, isPending] = useActionState(
     handleSubmit,
@@ -38,7 +40,8 @@ export default function UpdateProductModalForm({
   async function handleSubmit(_: unknown, data: FormData) {
     let image = data.get("image") as File;
 
-    let newProduct: ProductUpdateCreate = {
+    let newProduct: Product = {
+      id: productToUpdate.id,
       name: data.get("name") as string,
       sku: data.get("sku") as string,
       categoryId: data.get("category") as string,
@@ -53,7 +56,7 @@ export default function UpdateProductModalForm({
     const validationResult = validateData(newProduct);
 
     if (validationResult == null) {
-      await onCreate(newProduct);
+      update(newProduct);
     } else {
       return validationResult;
     }
@@ -61,7 +64,7 @@ export default function UpdateProductModalForm({
 
   return (
     <Modal onClose={onClose}>
-      <h2 className="p-10">Create product</h2>
+      <h2 className="p-10">Update product {productToUpdate.sku}</h2>
 
       <form
         className="w-full"
@@ -71,11 +74,21 @@ export default function UpdateProductModalForm({
         }}
       >
         <div className="mb-10 flex justify-evenly space-x-8">
-          <InputForm label="Name" name="name" required />
+          <InputForm
+            label="Name"
+            name="name"
+            defaultValue={productToUpdate.name}
+            required
+          />
           {possibleErrors?.name && (
             <span style={{ color: "red" }}>{possibleErrors.name}</span>
           )}
-          <InputForm label="Sku" name="sku" required />
+          <InputForm
+            label="Sku"
+            name="sku"
+            required
+            defaultValue={productToUpdate.sku}
+          />
           {possibleErrors?.sku && (
             <span style={{ color: "red" }}>{possibleErrors.sku}</span>
           )}
@@ -88,12 +101,30 @@ export default function UpdateProductModalForm({
             options={["Electronics", "Accesories"]}
             required
           />
-          <InputForm label="description" name="description" required />
+
+          <InputForm
+            label="description"
+            name="description"
+            required
+            defaultValue={productToUpdate.description}
+          />
         </div>
 
         <div className="mb-10 flex justify-evenly space-x-8">
-          <InputForm label="Quantity" type="number" name="quantity" required />
-          <InputForm label="Price" type="number" name="price" required />
+          <InputForm
+            label="Quantity"
+            type="number"
+            name="quantity"
+            required
+            defaultValue={productToUpdate.quantity}
+          />
+          <InputForm
+            label="Price"
+            type="number"
+            name="price"
+            required
+            defaultValue={productToUpdate.price}
+          />
         </div>
 
         <div className="mb-10 flex justify-evenly space-x-8">
@@ -115,7 +146,7 @@ export default function UpdateProductModalForm({
           disabled={isPending}
           className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
         >
-          {isPending ? "Loading" : "Create"}{" "}
+          {isPending ? "Loading" : "Update"}{" "}
         </button>
       </form>
     </Modal>

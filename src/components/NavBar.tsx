@@ -3,7 +3,6 @@ export default function NavBar() {
     <>
       <nav>
         <div>
-          {" "}
           <img src="" alt="The logo" /> Inventory management
         </div>
         <div></div>

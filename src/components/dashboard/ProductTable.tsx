@@ -5,7 +5,7 @@ import TableRow from "./tableRow";
 export interface ProductTableProps {
   isLoading: boolean;
   onButtonDeleteClick: (id: string) => void;
-  onUpdateButtonClick: () => void;
+  onUpdateButtonClick: (product: Product) => void;
   products: Product[];
 }
 
@@ -43,7 +43,7 @@ export default function ProductTable({
             <TableRow
               item={item}
               handleDeleteOnClick={() => onButtonDeleteClick(item.id)}
-              onUpdateClick={onUpdateButtonClick}
+              onUpdateClick={() => onUpdateButtonClick(item)}
             />
           ))
         )}

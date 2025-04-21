@@ -1,13 +1,34 @@
-import { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Product } from "../types/product";
 import { InventoryManager } from "../types/services";
-import Modal from "../components/modal";
 import CreateProductModalForm from "../components/dashboard/createProductForm";
 import useProducts from "../hooks/products";
 import ProductTable from "../components/dashboard/ProductTable";
+import UpdateProductModalForm from "../components/dashboard/updateProductForm";
 
 interface DashboardProps {
   inventoryManager: InventoryManager;
+}
+
+class Bad extends React.Component {
+  componentDidMount(): void {}
+
+  shouldComponentUpdate(
+    nextProps: Readonly<{}>,
+    nextState: Readonly<{}>,
+    nextContext: any,
+  ): boolean {
+    // Only re-render if the favoriteFood state has changed
+    //return this.state.favoriteFood !== nextState.favoriteFood;
+    return false;
+  }
+
+  /// On unmount
+  componentWillUnmount(): void {}
+
+  render(): React.ReactNode {
+    return <h1></h1>;
+  }
 }
 
 export default function Dashboard({ inventoryManager }: DashboardProps) {
@@ -16,13 +37,10 @@ export default function Dashboard({ inventoryManager }: DashboardProps) {
   const [isOpenModalCreate, setIsOpenModalCreate] = useState(false);
   const [isOpenModalUpdate, setIsOpenModalUpdate] = useState(false);
 
-  const {
-    products,
-    createProduct,
-    fetchProducts,
-    updateProduct,
-    deleteProduct,
-  } = useProducts(inventoryManager, setIsLoading);
+  const { products, createProduct, updateProduct, deleteProduct } = useProducts(
+    inventoryManager,
+    setIsLoading,
+  );
 
   const [productToUpdate, setProductToUpdate] = useState<Product>();
 
@@ -52,15 +70,23 @@ export default function Dashboard({ inventoryManager }: DashboardProps) {
       )}
 
       {isOpenModalUpdate && (
-        <Modal onClose={() => setIsOpenModalUpdate(false)}>
-          <h2>the modal update</h2>
-        </Modal>
+        <UpdateProductModalForm
+          productToUpdate={productToUpdate as Product}
+          onClose={() => setIsOpenModalUpdate(false)}
+          update={async (data) => {
+            await updateProduct(data);
+            setIsOpenModalUpdate(false);
+          }}
+        />
       )}
 
       <ProductTable
         products={products}
         onButtonDeleteClick={(id) => deleteProduct(id)}
-        onUpdateButtonClick={() => setIsOpenModalUpdate(true)}
+        onUpdateButtonClick={(product) => {
+          setIsOpenModalUpdate(true);
+          setProductToUpdate(product);
+        }}
         isLoading={isLoading}
       />
     </>
