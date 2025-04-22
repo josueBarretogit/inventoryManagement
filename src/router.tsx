@@ -1,8 +1,9 @@
 import { BrowserRouter, Route, Routes } from "react-router";
-import Dashboard from "./pages/dashboard";
-import NavBar from "./components/NavBar";
 import InventoryManagerMock from "./services/inventoryManagerMock";
 import ApiInventoryManager from "./services/inventoryManager";
+import React from "react";
+
+const Dashboard = React.lazy(() => import("./pages/dashboard.tsx"))
 
 export default function Router() {
   const baseUrl = import.meta.env.VITE_APP_API_URL;
@@ -13,7 +14,6 @@ export default function Router() {
 
   return (
     <>
-      <NavBar />
       <BrowserRouter>
         <Routes>
           <Route

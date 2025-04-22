@@ -9,3 +9,13 @@ export interface InventoryManager {
 
   deleteProduct(id: string): Promise<void>;
 }
+
+export interface Credentials {
+  userName: string,
+  password: string
+}
+
+
+export interface LoginProvider {
+  logIn(credentials: Credentials): Promise<boolean>
+}
